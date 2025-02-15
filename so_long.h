@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:46:12 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/13 14:46:47 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/13 18:30:54 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,9 @@ typedef struct s_data
     t_images    img;
     int c_ate;
     int nb_collectibles;
-    int player_x;  // Added player x coordinate
-    int player_y;  // Added player y coordinate
+    int player_x;
+    int player_y;
+    int nb_moves;
 }               t_data;
 
 

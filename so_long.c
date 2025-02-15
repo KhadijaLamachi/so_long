@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:45:45 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/13 14:52:13 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/15 22:24:16 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,18 +64,16 @@ void    ft_freee(char ***ptr)
     int i;
 
     i = 0;
-    if (*ptr)
+    if (!*ptr)
+        return ;
+    while ((*ptr)[i])
     {
-        while ((*ptr)[i])
-        {
-            free((*ptr)[i]);
-            i++;
-        }
+        free((*ptr)[i]);
+        i++;
     }
     free(*ptr);
     *ptr = NULL;
 }
-
 
 void    ft_free_img(void *mlx, t_images *img)
 {
@@ -102,84 +100,64 @@ int close_window(t_data *data)
     return (0);
 }
 
+void one_step(int *player_x, int *player_y, int x, int y)
+{
+    *player_x += x;
+    *player_y += y;
+}
 
-
-// #include <stdio.h>
-
-// int press_key(int key, t_data *data)
+// void close_and_exit(t_data *data)
 // {
-//     if (key == 65307)
-//         close_window(data);
-//     else if (key == 100)
-//     {
-//         if (data->map[data->player_y][data->player_x + 1] != '1')
-//         {
-//             data->map[data->player_y][data->player_x] = '0';
-//             data->player_x += 1;
-//             data->map[data->player_y][data->player_x] = 'P';
-//             mlx_clear_window(data->mlx, data->win);
-//             draw_map(data);
-//         }
-//     }
-//     return (0);
+//     close_window(data);
+//     exit(0);
 // }
 
+void stepping(t_data *data, int x, int y)
+{
+    static int exit;
+
+    if ((data->map[data->player_y + y][data->player_x + x] == 'E') && (data->c_ate == data->nb_collectibles))
+        close_window(data);
+    else if ((data->map[data->player_y + y][data->player_x + x] == 'C') || (data->map[data->player_y + y][data->player_x + x] == '0') || (data->map[data->player_y + y][data->player_x + x] == 'E'))
+    {
+        data->map[data->player_y][data->player_x] = '0';
+        if (exit == 1)
+            data->map[data->player_y][data->player_x] = 'E';
+        one_step(&(data->player_x), &(data->player_y), x, y);
+        if (data->map[data->player_y][data->player_x] == 'C')
+            data->c_ate++;
+        data->nb_moves++;
+        printf("nb_moves : %d\n", data->nb_moves);
+        exit = 0;
+        if (data->map[data->player_y][data->player_x] == 'E')
+            exit = 1;
+        data->map[data->player_y][data->player_x] = 'P';
+    }
+    else if ((data->map[data->player_y + y][data->player_x + x] == 'E') && (data->c_ate != data->nb_collectibles))
+        one_step(&(data->player_x), &(data->player_y), x, y);
+    else
+        return ;
+}
 
 int press_key(int key, t_data *data)
 {
+    int (x), (y);
+
+    x = 0;
+    y = 0;
     if (key == 65307)
         close_window(data);
-    else if (key == 100 || key == 97 || key == 115 || key == 119)
-    {
-        if (key == 100)
-        {
-            if (data->map[data->player_y][data->player_x + 1] != '1')
-            {
-                data->map[data->player_y][data->player_x] = '0';
-                data->player_x += 1;
-                if ((data->map[data->player_y][data->player_x] == 'E') && (data->c_ate == data->nb_collectibles))
-                    close_window(data);
-            }
-        }
-        else if (key == 97)
-        {
-            if (data->map[data->player_y][data->player_x - 1] != '1')
-            {
-                data->map[data->player_y][data->player_x] = '0';
-                data->player_x -= 1;
-                if ((data->map[data->player_y][data->player_x] == 'E') && (data->c_ate == data->nb_collectibles))
-                    close_window(data);
-            }
-        }
-        else if (key == 115)
-        {
-            if (data->map[data->player_y + 1][data->player_x] != '1')
-            {
-                data->map[data->player_y][data->player_x] = '0';
-                data->player_y += 1;
-                if ((data->map[data->player_y][data->player_x] == 'E') && (data->c_ate == data->nb_collectibles))
-                    close_window(data);
-            }
-        }
-        else if (key == 119)
-        {
-            if (data->map[data->player_y - 1][data->player_x] != '1')
-            {
-                data->map[data->player_y][data->player_x] = '0';
-                data->player_y -= 1;
-            }
-        }
-        if ((data->map[data->player_y][data->player_x] == 'E') && (data->c_ate == data->nb_collectibles))
-            close_window(data);
-    }
-    else
+    else if (key == 100)
+        x = 1;
+    else if (key == 97)
+        x = -1;
+    else if (key == 115)
+        y = 1;
+    else if (key == 119)
+        y = -1;
+    if (x == 0 && y == 0)
         return (0);
-    if (data->map[data->player_y][data->player_x] == 'C')
-    {
-        data->c_ate++;
-        printf("nb_collectibles_ate : %d\n", data->c_ate);
-    }
-    data->map[data->player_y][data->player_x] = 'P';
+    stepping(data, x, y);
     mlx_clear_window(data->mlx, data->win);
     draw_map(data);
     return (0);
@@ -187,6 +165,7 @@ int press_key(int key, t_data *data)
 
 int main(int argc, char **argv)
 {
+      //printf("------>    here   <--------");
     t_data  data;
     int height_map;
     size_t width_map;
@@ -194,6 +173,7 @@ int main(int argc, char **argv)
     data.player_y = 1;
     data.c_ate = 0;
     data.nb_collectibles = 0;
+    data.nb_moves = 0;
 
     if (argc < 2)
     {
@@ -202,12 +182,17 @@ int main(int argc, char **argv)
     }
     data.img.tile_size = 32;
     data.map = handle_input(&data, argv[1], &height_map, &width_map);
+    if (!data.map)
+    {
+        write(1, "Error: Invalid map\n", 19);
+        return (1);
+    }
     data.mlx = mlx_init();
     data.win = mlx_new_window(data.mlx, (width_map * data.img.tile_size), (height_map * data.img.tile_size), "so_long");
     load_images(data.mlx, &(data.img));
     draw_map(&data);
     mlx_hook(data.win, 17, 0, close_window, &data);
-    mlx_key_hook(data.win, press_key, &data);
+    mlx_hook(data.win, 2, 1L << 0, press_key, &data);
+    // mlx_key_hook(data.win, press_key, &data);
     mlx_loop(data.mlx);
 }
-

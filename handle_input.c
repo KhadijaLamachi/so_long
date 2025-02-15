@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 17:48:14 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/13 14:46:55 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/15 22:40:26 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,29 +41,29 @@ static void free_line(char *line, const char *msg)
     exit(1);
 }
 
-int    is_rectangular(int fd, size_t *len_line)
+int is_rectangular(int fd, size_t *len_line)
 {
     char    *line;
-    int nb_lines;
+    int     nb_lines;
 
     nb_lines = 0;
     line = get_next_line(fd);
     if (!line)
-        free_line(line, "Error\nMap is empty!!!\n");
+        free_line(NULL, "Error\nMap is empty!!!\n");
     *len_line = ft_strlen(line);
-    if (line[*len_line - 1] == '\n')
+    if (*len_line > 0 && line[*len_line - 1] == '\n') 
     {
         (*len_line)--;
         line[*len_line] = '\0';
     }
     while (line)
     {
-        if (line[*len_line] == '\n')
-            line[*len_line] = '\0';
-        if (*len_line != ft_strlen(line))
-            free_line(line, "Error\nOh sorry the map is not rectangular!!\n");
+        if (*len_line != ft_strlen(line)) 
+            free_line(line, "Error\nOh sorry, the map is not rectangular!!\n");
         free(line);
         line = get_next_line(fd);
+        if (line && ft_strlen(line) > 0 && line[ft_strlen(line) - 1] == '\n')
+            line[ft_strlen(line) - 1] = '\0';
         nb_lines++;
     }
     return (nb_lines);
@@ -100,7 +100,6 @@ void exit_with_error(char **map, const char *msg)
     perror(msg);
     exit(1);
 }
-
 
 int    is_valid_character(char *line)
 {
@@ -214,5 +213,3 @@ char    **handle_input(t_data  *data, char *path, int *nb_lines, size_t *len_lin
     check_walls(ptr);
     return (check_map_characters(ptr, data), ptr);
 }
-
-
