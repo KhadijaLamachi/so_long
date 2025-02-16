@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:46:12 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/13 18:30:54 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/16 10:04:29 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ typedef struct s_data
     int nb_moves;
 }               t_data;
 
-
+void free_gnl(char **reminder);
 // Function declarations
 void load_images(void *mlx, t_images *images);
 void    draw_map(t_data *data);

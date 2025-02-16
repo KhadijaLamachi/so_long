@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:45:45 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/15 22:24:16 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/16 11:56:05 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,6 @@ int press_key(int key, t_data *data)
 
 int main(int argc, char **argv)
 {
-      //printf("------>    here   <--------");
     t_data  data;
     int height_map;
     size_t width_map;
@@ -195,4 +194,5 @@ int main(int argc, char **argv)
     mlx_hook(data.win, 2, 1L << 0, press_key, &data);
     // mlx_key_hook(data.win, press_key, &data);
     mlx_loop(data.mlx);
+    // free_gnl(&reminder);
 }

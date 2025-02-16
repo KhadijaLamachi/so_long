@@ -353,6 +353,43 @@ void    check_map_characters(char **ptr, t_data  *data)
     data->nb_collectibles = C;
 }
 
+
+
+
+// int is_rectangular(int fd, size_t *len_line)
+// {
+//     char    *line;
+//     int     nb_lines;
+//     static char *reminder;
+
+//     nb_lines = 0;
+//     line = get_next_line(fd, &reminder);
+//     if (!line)
+//         free_line(NULL, "Error\nMap is empty!!!\n", &reminder);
+//     *len_line = ft_strlen(line);
+//     while (line)
+//     {
+//         if (*len_line == ft_strlen(line) || (*len_line - 1) == ft_strlen(line))
+//         {
+//             if (line[*len_line - 1] == '\0' || line[*len_line - 1] == '\n')
+//             {
+//                 free(line);
+//                 line = get_next_line(fd, &reminder);
+//             }
+//             else if ()
+//                 free_line(line, "Error\nOh sorry, the map is not rectangular!!\n", &reminder);
+//         }
+//         else
+//             free_line(line, "Error\nOh sorry, the map is not rectangular!!\n", &reminder);
+//         nb_lines++;
+//     }
+//     (*len_line)--;
+//     return (nb_lines);
+// }
+
+
+
+
 int    is_wall(char *line, char c)
 {
     size_t len;

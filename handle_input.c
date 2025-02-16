@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 17:48:14 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/15 22:40:26 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/16 14:41:34 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,37 +34,45 @@ void    is_valid_path_ext(char *path)
     close(fd);
 }
 
-static void free_line(char *line, const char *msg)
+void free_gnl(char **reminder)
 {
-    free(line);
-    perror(msg);
-    exit(1);
+    if (reminder && *reminder)
+    {
+        free(*reminder);
+        *reminder = NULL;
+    }
 }
 
+static void free_line(char *line, const char *msg, char **reminder)
+{
+    if (line)
+        free(line);
+    perror(msg);
+    free_gnl(reminder);
+    exit(1);
+}
 int is_rectangular(int fd, size_t *len_line)
 {
     char    *line;
     int     nb_lines;
+    static char *reminder;
 
     nb_lines = 0;
-    line = get_next_line(fd);
+    line = get_next_line(fd, &reminder);
     if (!line)
-        free_line(NULL, "Error\nMap is empty!!!\n");
+        free_line(NULL, "Error\nMap is empty!!!\n", &reminder);
+    if (line[ft_strlen(line) - 1] == '\n')
+        line[ft_strlen(line) - 1] = '\0';
     *len_line = ft_strlen(line);
-    if (*len_line > 0 && line[*len_line - 1] == '\n') 
-    {
-        (*len_line)--;
-        line[*len_line] = '\0';
-    }
     while (line)
     {
-        if (*len_line != ft_strlen(line)) 
-            free_line(line, "Error\nOh sorry, the map is not rectangular!!\n");
-        free(line);
-        line = get_next_line(fd);
-        if (line && ft_strlen(line) > 0 && line[ft_strlen(line) - 1] == '\n')
+        if (ft_strlen(line) && line[ft_strlen(line) - 1] == '\n')
             line[ft_strlen(line) - 1] = '\0';
+        if (ft_strlen(line) != *len_line)
+            free_line(line, "Error\nOh sorry, the map is not rectangular!!\n", &reminder);
         nb_lines++;
+        free(line);
+        line = get_next_line(fd, &reminder);
     }
     return (nb_lines);
 }
@@ -190,6 +198,7 @@ char    **handle_input(t_data  *data, char *path, int *nb_lines, size_t *len_lin
     int (fd), (i);
     char    *line;
     char    **ptr;
+    static char *reminder;
 
     ptr = NULL;
     i = 0;
@@ -201,15 +210,14 @@ char    **handle_input(t_data  *data, char *path, int *nb_lines, size_t *len_lin
     if (!ptr)
         exit_with_error(ptr, "Error:!!!\n");
     fd = open(path, O_RDONLY);
-    line = get_next_line(fd);
+    line = get_next_line(fd, &reminder);
     while (line)
     {
         ptr[i] = line;
-        line = get_next_line(fd);
+        line = get_next_line(fd, &reminder);
         i++;
     }
     ptr[i] = NULL;
     close(fd);
-    check_walls(ptr);
-    return (check_map_characters(ptr, data), ptr);
+    return (check_walls(ptr), check_map_characters(ptr, data), free_gnl(&reminder), ptr);
 }
