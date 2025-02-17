@@ -2,11 +2,10 @@ NAME=so_long
 
 CC=cc
 
-# CFLAGS=-Wall -Wextra -Werror -Iminilibx-linux -Lminilibx-linux -lmlx -lX11 -lXext -lm
 CFLAGS = -Wall -Wextra -Werror -I/usr/include/minilibx-linux 
 LFLAGS = -L/usr/include/minilibx-linux/ -lmlx_Linux -lXext -lX11 
 
-SRC=so_long.c handle_input.c ft_strrchr.c ft_strcmp.c get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
+SRC=so_long.c handle_input.c get_next_line/get_next_line.c get_next_line/get_next_line_utils.c utils.c free_close.c draw.c check_wall_characters.c flood_fill.c
 
 OBJ=$(SRC:.c=.o)
 
@@ -14,13 +13,16 @@ OBJ=$(SRC:.c=.o)
 
 all:$(NAME)
 
-$(NAME):$(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) $(LFLAGS) -o $@
+$(NAME): $(OBJ)
+	make -C ft_printf
+	$(CC) $(CFLAGS) $(OBJ) -Lft_printf -lftprintf $(LFLAGS) -o $@
 
 clean:
 	rm -f $(OBJ)
+	make -C ft_printf clean
 
-fclean:clean
+fclean: clean
 	rm -f $(NAME)
+	make -C ft_printf fclean
 
 re:fclean all

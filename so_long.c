@@ -6,193 +6,102 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:45:45 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/16 11:56:05 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/17 23:48:11 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-void load_images(void *mlx, t_images *img)
+void	one_step(int *player_x, int *player_y, int x, int y)
 {
-    int width, height;
-
-    img->wall = mlx_xpm_file_to_image(mlx, "wall.xpm", &width, &height);
-    img->floor = mlx_xpm_file_to_image(mlx, "floor.xpm", &width, &height);
-    img->player = mlx_xpm_file_to_image(mlx, "player.xpm", &width, &height);
-    img->collectible = mlx_xpm_file_to_image(mlx, "collectible.xpm", &width, &height);
-    img->exit = mlx_xpm_file_to_image(mlx, "exit.xpm", &width, &height);
-    if (!img->wall || !img->floor || !img->player || !img->collectible || !img->exit)
-    {
-        perror("Image not found!!");
-        exit(1);
-    }
+	*player_x += x;
+	*player_y += y;
 }
 
-void    put_img(t_data *data, char tile, int j, int i)
+void	stepping(t_data *data, int x, int y)
 {
-    if (tile == '1')
-        mlx_put_image_to_window(data->mlx, data->win, data->img.wall, (j * data->img.tile_size), (i * data->img.tile_size));
-    else if (tile == '0')
-        mlx_put_image_to_window(data->mlx, data->win, data->img.floor, (j * data->img.tile_size), (i * data->img.tile_size));
-    else if (tile == 'P')
-        mlx_put_image_to_window(data->mlx, data->win, data->img.player, (j * data->img.tile_size), (i * data->img.tile_size));
-    else if (tile == 'C')
-        mlx_put_image_to_window(data->mlx, data->win, data->img.collectible, (j * data->img.tile_size), (i * data->img.tile_size));
-    else if (tile == 'E')
-        mlx_put_image_to_window(data->mlx, data->win, data->img.exit, (j * data->img.tile_size), (i * data->img.tile_size));
+	static int	exit;
+	char		next_pos;
+
+	next_pos = data->map[data->player_y + y][data->player_x + x];
+	if (next_pos == 'E' && data->cate == data->nbcol)
+		close_window(data);
+	else if (next_pos == 'C' || next_pos == '0' || next_pos == 'E')
+	{
+		if (exit == 1)
+			data->map[data->player_y][data->player_x] = 'E';
+		else
+			data->map[data->player_y][data->player_x] = '0';
+		data->player_x += x;
+		data->player_y += y;
+		if (data->map[data->player_y][data->player_x] == 'C')
+			data->cate++;
+		data->nb_moves++;
+		ft_printf("nb_moves : %d\n", data->nb_moves);
+		exit = 0;
+		if (data->map[data->player_y][data->player_x] == 'E')
+			exit = 1;
+		data->map[data->player_y][data->player_x] = 'P';
+	}
 }
 
-void    draw_map(t_data *data)
+int	press_key(int key, t_data *data)
 {
-    int (i), (j);
-    
-    i = 0;
-    while (data->map[i])
-    {
-        j = 0;
-        while (data->map[i][j])
-        {
-            put_img(data, data->map[i][j], j, i);
-            j++;
-        }
-        i++;
-    }
+	int (x), (y);
+	x = 0;
+	y = 0;
+	if (key == 65307)
+		close_window(data);
+	else if (key == 100)
+		x = 1;
+	else if (key == 97)
+		x = -1;
+	else if (key == 115)
+		y = 1;
+	else if (key == 119)
+		y = -1;
+	if (x == 0 && y == 0)
+		return (0);
+	stepping(data, x, y);
+	mlx_clear_window(data->mlx, data->win);
+	draw_map(data);
+	return (0);
 }
 
-void    ft_freee(char ***ptr)
+static void	initialize_data(t_data *data)
 {
-    int i;
-
-    i = 0;
-    if (!*ptr)
-        return ;
-    while ((*ptr)[i])
-    {
-        free((*ptr)[i]);
-        i++;
-    }
-    free(*ptr);
-    *ptr = NULL;
+	data->player_x = 1;
+	data->player_y = 1;
+	data->cate = 0;
+	data->nbcol = 0;
+	data->nb_moves = 0;
+	data->cate = 0;
+	data->nb_E = 0;
 }
 
-void    ft_free_img(void *mlx, t_images *img)
+int	main(int argc, char **argv)
 {
-    if (img->wall)
-        mlx_destroy_image(mlx, img->wall);
-    if (img->player)
-        mlx_destroy_image(mlx, img->player);
-    if (img->collectible)
-        mlx_destroy_image(mlx, img->collectible);
-    if (img->floor)
-        mlx_destroy_image(mlx, img->floor);
-    if (img->exit)
-        mlx_destroy_image(mlx, img->exit);
-}
+	t_data	data;
+	int		height_map;
+	size_t	width_map;
 
-int close_window(t_data *data)
-{
-    ft_freee(&(data->map));
-    ft_free_img(data->mlx, &(data->img));
-    mlx_destroy_window(data->mlx, data->win);
-    mlx_destroy_display(data->mlx);
-    free(data->mlx);
-    exit(0);
-    return (0);
-}
-
-void one_step(int *player_x, int *player_y, int x, int y)
-{
-    *player_x += x;
-    *player_y += y;
-}
-
-// void close_and_exit(t_data *data)
-// {
-//     close_window(data);
-//     exit(0);
-// }
-
-void stepping(t_data *data, int x, int y)
-{
-    static int exit;
-
-    if ((data->map[data->player_y + y][data->player_x + x] == 'E') && (data->c_ate == data->nb_collectibles))
-        close_window(data);
-    else if ((data->map[data->player_y + y][data->player_x + x] == 'C') || (data->map[data->player_y + y][data->player_x + x] == '0') || (data->map[data->player_y + y][data->player_x + x] == 'E'))
-    {
-        data->map[data->player_y][data->player_x] = '0';
-        if (exit == 1)
-            data->map[data->player_y][data->player_x] = 'E';
-        one_step(&(data->player_x), &(data->player_y), x, y);
-        if (data->map[data->player_y][data->player_x] == 'C')
-            data->c_ate++;
-        data->nb_moves++;
-        printf("nb_moves : %d\n", data->nb_moves);
-        exit = 0;
-        if (data->map[data->player_y][data->player_x] == 'E')
-            exit = 1;
-        data->map[data->player_y][data->player_x] = 'P';
-    }
-    else if ((data->map[data->player_y + y][data->player_x + x] == 'E') && (data->c_ate != data->nb_collectibles))
-        one_step(&(data->player_x), &(data->player_y), x, y);
-    else
-        return ;
-}
-
-int press_key(int key, t_data *data)
-{
-    int (x), (y);
-
-    x = 0;
-    y = 0;
-    if (key == 65307)
-        close_window(data);
-    else if (key == 100)
-        x = 1;
-    else if (key == 97)
-        x = -1;
-    else if (key == 115)
-        y = 1;
-    else if (key == 119)
-        y = -1;
-    if (x == 0 && y == 0)
-        return (0);
-    stepping(data, x, y);
-    mlx_clear_window(data->mlx, data->win);
-    draw_map(data);
-    return (0);
-}
-
-int main(int argc, char **argv)
-{
-    t_data  data;
-    int height_map;
-    size_t width_map;
-    data.player_x = 1;
-    data.player_y = 1;
-    data.c_ate = 0;
-    data.nb_collectibles = 0;
-    data.nb_moves = 0;
-
-    if (argc < 2)
-    {
-        write(1, "\n", 1);
-        return (0);
-    }
-    data.img.tile_size = 32;
-    data.map = handle_input(&data, argv[1], &height_map, &width_map);
-    if (!data.map)
-    {
-        write(1, "Error: Invalid map\n", 19);
-        return (1);
-    }
-    data.mlx = mlx_init();
-    data.win = mlx_new_window(data.mlx, (width_map * data.img.tile_size), (height_map * data.img.tile_size), "so_long");
-    load_images(data.mlx, &(data.img));
-    draw_map(&data);
-    mlx_hook(data.win, 17, 0, close_window, &data);
-    mlx_hook(data.win, 2, 1L << 0, press_key, &data);
-    // mlx_key_hook(data.win, press_key, &data);
-    mlx_loop(data.mlx);
-    // free_gnl(&reminder);
+	initialize_data(&data);
+	if (argc < 2)
+		return (write(2, "Error\nUsage: ./so_long <map_file.ber>\n", 38), 0);
+	data.img.tile_size = 32;
+	data.map = handle_input(&data, argv[1], &height_map, &width_map);
+	player_path(&data, height_map, width_map);
+	data.cate = 0;
+	data.mlx = mlx_init();
+	if (!data.mlx)
+		return (write(2, "Error\nMLX failed to initialize\n", 32), 1);
+	data.win = mlx_new_window(data.mlx, (width_map * data.img.tile_size),
+			(height_map * data.img.tile_size), "so_long");
+	if (!data.win)
+		return (write(2, "Error\nMLX failed to open the window\n", 32), 1);
+	load_images(data.mlx, &(data.img));
+	draw_map(&data);
+	mlx_hook(data.win, 17, 0, close_window, &data);
+	mlx_hook(data.win, 2, 1L << 0, press_key, &data);
+	mlx_loop(data.mlx);
 }
