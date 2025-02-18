@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:45:45 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/17 23:48:11 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/18 09:55:54 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,13 +70,13 @@ int	press_key(int key, t_data *data)
 
 static void	initialize_data(t_data *data)
 {
-	data->player_x = 1;
-	data->player_y = 1;
+	data->player_x = 0;
+	data->player_y = 0;
 	data->cate = 0;
 	data->nbcol = 0;
 	data->nb_moves = 0;
 	data->cate = 0;
-	data->nb_E = 0;
+	data->nb_e = 0;
 }
 
 int	main(int argc, char **argv)
@@ -90,6 +90,7 @@ int	main(int argc, char **argv)
 		return (write(2, "Error\nUsage: ./so_long <map_file.ber>\n", 38), 0);
 	data.img.tile_size = 32;
 	data.map = handle_input(&data, argv[1], &height_map, &width_map);
+	find_player(data.map, &(data.player_x), &(data.player_y));
 	player_path(&data, height_map, width_map);
 	data.cate = 0;
 	data.mlx = mlx_init();
