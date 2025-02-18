@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 08:46:12 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/17 23:53:52 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/18 09:29:21 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,12 @@ typedef struct s_point
 	int	y;
 }		t_point;
 
+typedef struct s_dim
+{
+	int	width;
+	int	height;
+}		t_dim;
+
 typedef struct s_images
 {
 	void	*wall;
@@ -43,7 +49,7 @@ typedef struct s_data
 	char		**map;
 	t_images	img;
 	int			cate;
-	int			nb_E;
+	int			nb_e;
 	int			nbcol;
 	int			player_x;
 	int			player_y;
@@ -57,7 +63,7 @@ int		is_rectangular(int fd, size_t *len_line);
 void	is_valid_path_ext(char *path);
 // flood_fill
 void	find_player(char **map, int *x, int *y);
-void	flood_fill(t_data *data, char **test_map, t_point player, int map_height, int map_width);
+void	flood_fill(t_data *data, char **test_map, t_point player, t_dim d);
 char	**map_copy(char **map, int nb_lines, int len_line);
 void	player_path(t_data *data, int map_height, int map_width);
 
@@ -83,7 +89,5 @@ void	free_line(char *line, const char *msg, char **reminder);
 // utils
 char	*ft_strrchr(const char *s, int c);
 int		ft_strcmp(const char *s1, const char *s2);
-void	flood_fill(t_data *data, char **test_map, t_point player, int map_height, int map_width);
-void	player_path(t_data *data, int map_height, int map_width);
 
 #endif

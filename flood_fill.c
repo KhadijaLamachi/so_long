@@ -6,7 +6,7 @@
 /*   By: klamachi <klamachi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:02:57 by klamachi          #+#    #+#             */
-/*   Updated: 2025/02/17 23:57:06 by klamachi         ###   ########.fr       */
+/*   Updated: 2025/02/18 09:30:50 by klamachi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,26 +27,27 @@ void	find_player(char **map, int *x, int *y)
 	}
 }
 
-void	flood_fill(t_data *data, char **test_map, t_point player, int map_height, int map_width)
+void	flood_fill(t_data *data, char **test_map, t_point p, t_dim d)
 {
-	if (test_map[player.y][player.x] == '1' || test_map[player.y][player.x] == 'V')
+	if (test_map[p.y][p.x] == '1'
+		|| test_map[p.y][p.x] == 'V')
 		return ;
-	else if (test_map[player.y][player.x] == 'C')
+	else if (test_map[p.y][p.x] == 'C')
 		data->cate++;
-	else if (test_map[player.y][player.x] == 'E')
-		data->nb_E++;
-	test_map[player.y][player.x] = 'V';
-	flood_fill(data, test_map, (t_point){player.x, player.y + 1}, map_height, map_width);
-	flood_fill(data, test_map, (t_point){player.x, player.y - 1}, map_height, map_width);
-	flood_fill(data, test_map, (t_point){player.x + 1, player.y}, map_height, map_width);
-	flood_fill(data, test_map, (t_point){player.x - 1, player.y}, map_height, map_width);
+	else if (test_map[p.y][p.x] == 'E')
+		data->nb_e++;
+	test_map[p.y][p.x] = 'V';
+	flood_fill(data, test_map, (t_point){p.x, p.y + 1}, d);
+	flood_fill(data, test_map, (t_point){p.x, p.y - 1}, d);
+	flood_fill(data, test_map, (t_point){p.x + 1, p.y}, d);
+	flood_fill(data, test_map, (t_point){p.x - 1, p.y}, d);
 }
 
-char **map_copy(char **map, int nb_lines, int len_line)
+char	**map_copy(char **map, int nb_lines, int len_line)
 {
-	int	i;
-	int	j;
-	char **test_map;
+	int		i;
+	int		j;
+	char	**test_map;
 
 	i = -1;
 	test_map = malloc(sizeof(char *) * (nb_lines + 1));
@@ -73,21 +74,25 @@ char **map_copy(char **map, int nb_lines, int len_line)
 void	player_path(t_data *data, int map_height, int map_width)
 {
 	t_point	player;
-	char **test_map;
-	int x;
-	int y;
-	
+	char	**test_map;
+	int		x;
+	int		y;
+	t_dim	d;
+
+	d.width = map_width;
+	d.height = map_height;
 	x = 0;
 	y = 0;
 	test_map = map_copy(data->map, map_height, map_width);
 	find_player(test_map, &x, &y);
 	player.x = x;
 	player.y = y;
-	flood_fill(data, test_map, player, map_height, map_width);
-	if ((data->nb_E != 1) || (data->nbcol != data->cate))
+	flood_fill(data, test_map, player, d);
+	if ((data->nb_e != 1) || (data->nbcol != data->cate))
 	{
 		ft_freee(&test_map);
-		exit_with_error(data->map, "Error\nThe player cannot reach all collectibles or the exit!");
+		exit_with_error(data->map,
+			"Error\nThe player cannot reach all collectibles or the exit!");
 	}
 	ft_freee(&test_map);
 }
