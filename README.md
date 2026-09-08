@@ -8,7 +8,7 @@ The goal is to collect all collectibles on the map and then reach the exit. The 
 
 ## Screenshot
 
-![So Long gameplay](screenshots/gameplay.png)
+![So Long gameplay](images/gameplay.png)
 
 ## Features
 
