@@ -14,9 +14,9 @@ NAME = so_long
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror -I/usr/include/minilibx-linux 
+CFLAGS = -Wall -Wextra -Werror -I./minilibx-linux 
 
-LFLAGS = -L/usr/include/minilibx-linux/ -lmlx_Linux -lXext -lX11 
+LFLAGS = -L./minilibx-linux/ -lmlx_Linux -lXext -lX11 
 
 SRC = so_long.c handle_input.c get_next_line/get_next_line.c get_next_line/get_next_line_utils.c utils.c free_close.c draw.c check_wall_characters.c flood_fill.c
 
@@ -27,6 +27,7 @@ OBJ = $(SRC:.c=.o)
 all:$(NAME)
 
 $(NAME): $(OBJ)
+	make -C minilibx-linux
 	make -C ft_printf
 	$(CC) $(CFLAGS) $(OBJ) -Lft_printf -lftprintf $(LFLAGS) -o $@
 
