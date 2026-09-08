@@ -73,7 +73,6 @@ char	**map_copy(char **map, int nb_lines, int len_line)
 
 void	player_path(t_data *data, int map_height, int map_width)
 {
-	t_point	player;
 	char	**test_map;
 	int		x;
 	int		y;
@@ -82,8 +81,6 @@ void	player_path(t_data *data, int map_height, int map_width)
 	y = 0;
 	test_map = map_copy(data->map, map_height, map_width);
 	find_player(test_map, &x, &y);
-	player.x = x;
-	player.y = y;
 	flood_fill(data, test_map, x, y);
 	if ((data->nb_e != 1) || (data->nbcol != data->cate))
 	{
